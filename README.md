@@ -1,5 +1,5 @@
 # docker-disco-example
-An example bot built on the `spencersharkey/disco` Docker image!
+An example bot built on the [spencersharkey/disco](http://github.com/SpencerSharkey/docker-disco-example/) Docker image!
 
 Writing, testing, and deploying a Discord bot in a few lines of code... no problem!
 
