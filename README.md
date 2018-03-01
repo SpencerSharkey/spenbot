@@ -2,6 +2,8 @@
 
 Lets people control your smart home on Discord.
 
+![](https://i.gyazo.com/d669b3c521b78323096f15323636e741.gif)
+
 Some other neat stuff too.
 
 ## run it interactively
