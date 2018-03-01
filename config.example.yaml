@@ -1,0 +1,26 @@
+token: '<your discord bot token>'
+
+bot:
+  plugins:
+    - plugins.ping
+    - plugins.doorman
+    - plugins.smartthings
+    - plugins.rust
+
+  plugin_config:
+    smartthings:
+      graph_endpoint: 'https://graph-na04-useast2.api.smartthings.com/api/smartapps/installations/<YOUR-APP-ID>'
+      graph_access_token: '<YOUR ACCESS TOKEN>'
+
+      pubnub_enabled: true
+      pubnub_pub_key: '<PUBNUB KEY>'
+      pubnub_sub_key: '<PUBNUB SUB KEY>'
+      pubnub_channel: 'spenbot'
+
+      pubnub_channel_id: 407461171738705921
+      events_channel_id: 407482993502978048
+
+  commands_prefix: '!'
+  commands_require_mention: false
+  commands_allow_edit: true
+  plugin_config_format: 'yaml'

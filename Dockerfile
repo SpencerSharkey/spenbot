@@ -1,2 +1,3 @@
 FROM spencersharkey/disco:latest
-ENV DISCO_ARGS --run-bot --plugin discoexample
+ENV DISCO_ARGS --run-bot --plugins discoexample
+ADD * /opt/

@@ -1,1 +1,16 @@
-# If you need to include pip modules, feel free to add them here. The disco docker image will install them at build time.
+certifi==2018.1.18
+chardet==3.0.4
+disco-py==0.0.12rc4
+fuzzywuzzy==0.16.0
+gevent==1.2.2
+greenlet==0.4.12
+holster==2.0.0
+idna==2.6
+pubnub==4.0.13
+pyaml==17.12.1
+pycryptodomex==3.4.8
+PyYAML==3.12
+requests==2.18.4
+six==1.11.0
+urllib3==1.22
+websocket-client==0.44.0
