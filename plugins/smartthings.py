@@ -1,5 +1,4 @@
 import json
-import socket
 import requests
 from fuzzywuzzy import fuzz
 
@@ -9,11 +8,11 @@ from disco.types.user import Status, Game, GameType
 from disco.types.message import Emoji, MessageEmbed
 
 from pubnub.callbacks import SubscribeCallback
-from pubnub.enums import PNStatusCategory
 from pubnub.pnconfiguration import PNConfiguration
 from pubnub.pubnub import PubNub, PNReconnectionPolicy
 
 EVENT_CALLBACK_MSG = '`{}` - {}: {}'
+
 
 class SwitchEmbed(MessageEmbed):
     def set_device(self, device):
@@ -24,7 +23,8 @@ class SwitchEmbed(MessageEmbed):
         color = 0x000000
         if val == 'on':
             color = 0xFFFFFF
-        self.color =color
+        self.color = color
+
 
 class EventEmbed(MessageEmbed):
     attribute = None
@@ -50,6 +50,7 @@ class EventEmbed(MessageEmbed):
         }
         return True
 
+
 class DoorEmbed(EventEmbed):
     attribute = 'contact'
     emoji = ':door:'
@@ -57,6 +58,7 @@ class DoorEmbed(EventEmbed):
         'open': 0x00FF00,
         'closed': 0xFF0000
     }
+
 
 class PresenceEmbed(EventEmbed):
     attribute = 'presence'
@@ -66,6 +68,7 @@ class PresenceEmbed(EventEmbed):
         'not present': 0xFFB01E
     }
 
+
 class MotionEmbed(EventEmbed):
     attribute = 'presence'
     emoji = ':iphone:'
@@ -80,19 +83,6 @@ class MotionEmbed(EventEmbed):
         'inactive': 0xFFB01E
     }
 
-class MotionEmbed(EventEmbed):
-    attribute = 'motion'
-    emoji = ':eyes:'
-    include = {
-        'active'
-    }
-    messages = {
-        'active': 'has been triggered!'
-    }
-    colors = {
-        'active': 0x44CCFF,
-        'inactive': 0xFFB01E
-    }
 
 class EventCallback(SubscribeCallback):
     def __init__(self, plugin):
@@ -133,7 +123,7 @@ class EventCallback(SubscribeCallback):
                 # Motion
                 if msg['attribute'] == 'motion':
                     status = MotionEmbed()
-                    if status.set_device(device)!= False:
+                    if status.set_device(device) != False:
                         event_chan.send_message(embed=status)
 
                 # Motion
@@ -141,6 +131,7 @@ class EventCallback(SubscribeCallback):
                     status = PresenceEmbed()
                     if status.set_device(device) != False:
                         event_chan.send_message(embed=status)
+
 
 class SmartthingsConfig(Config):
     graph_endpoint = 'http://localhost'
@@ -157,6 +148,7 @@ class SmartthingsConfig(Config):
 
     emoji_off = 'spenbot_off:407468391365083167'
     emoji_on = 'spenbot_on:407468402098307072'
+
 
 @Plugin.with_config(SmartthingsConfig)
 class SmartthingsPlugin(Plugin):
@@ -234,7 +226,7 @@ class SmartthingsPlugin(Plugin):
         self.load_devices()
         device_list = 'Device List:\n\t'
         for deviceid, device in self.devices.iteritems():
-            if not capability or capability.lower() in map(lambda c:c.lower(), device['capabilities']):
+            if not capability or capability.lower() in map(lambda c: c.lower(), device['capabilities']):
                 device_list += '{} - [`{}`]\n\t'.format(
                     device['name'],
                     '`, `'.join(device['capabilities'])
@@ -261,21 +253,24 @@ class SmartthingsPlugin(Plugin):
         status = SwitchEmbed()
         status.set_device(device)
         msg = event.msg.reply(embed=status)
-        msg.chain(False).\
-            add_reaction(get_emoji(self.config.emoji_off)).\
+        msg.chain(False). \
+            add_reaction(get_emoji(self.config.emoji_off)). \
             add_reaction(get_emoji(self.config.emoji_on))
 
         self.switch_messages[device['deviceid']] = msg
         self.switch_messages_id[msg.id] = device
 
-    def api_call(self, endpoint, payload={}, method='GET'):
+    def api_call(self, endpoint, payload=None, method='GET'):
+        if not payload:
+            payload = {}
         url = self.config.graph_endpoint + endpoint
         payload['access_token'] = self.config.graph_access_token
-        req = requests.get(url, params=payload)
+        req = requests.request(method, url=url, params=payload)
         return req
 
-
-    def api_command(self, device_id, command, params={}, value1=None, value2=None):
+    def api_command(self, device_id, command, params=None, value1=None, value2=None):
+        if not params:
+            params = {}
         url = self.config.graph_endpoint + '/' + device_id + '/command/' + command
         params['access_token'] = self.config.graph_access_token
         payload = {
