@@ -35,8 +35,8 @@ class SmartthingsConfig(Config):
 
 @Plugin.with_config(SmartthingsConfig)
 class SmartthingsPlugin(Plugin):
-    def __init__(self):
-        super(SmartthingsPlugin, self).__init__()
+    def __init__(self, *args, **kwargs):
+        super(SmartthingsPlugin, self).__init__(*args, **kwargs)
         self.devices = {}
         self.switch_messages = {}
         self.switch_messages_id = {}

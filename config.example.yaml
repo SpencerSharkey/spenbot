@@ -5,6 +5,7 @@ bot:
     - plugins.ping
     - plugins.doorman
     - plugins.smartthings
+    - plugins.sonos
     - plugins.rust
 
   plugin_config:
@@ -19,6 +20,10 @@ bot:
 
       pubnub_channel_id: 407461171738705921
       events_channel_id: 407482993502978048
+    sonos:
+      http_bridge_uri: 'http://127.0.0.1:5005'
+      discovery_interface: '192.168.1.69'
+      discovery_timeout: 5
 
   commands_prefix: '!'
   commands_require_mention: false
