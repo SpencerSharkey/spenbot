@@ -3,6 +3,7 @@ import urllib
 import requests
 import soco
 from disco.bot import Plugin, Config
+from disco.bot.command import CommandError
 
 
 class SonosConfig(Config):
@@ -35,6 +36,14 @@ class SonosPlugin(Plugin):
     def say(self, msg):
         requests.get(self.config.http_bridge_uri + '/sayall/' + urllib.quote(msg))
 
+    @Plugin.listen('MessageCreate')
+    def on_messagecreate(self, event):
+        msg = event.message
+        if 61189081970774016 in msg.mentions:
+            announcement = msg.channel.send_message(':loudspeaker: :house: Letting Master Spencer know that he was mentioned.')
+            self.say(u'Mentioned on Discord: {}'.format(msg.with_proper_mentions).replace('#0001', ''))
+            announcement.edit(':loudspeaker: :house: :ok: Announced to home speakers that Master Spencer was mentioned!')
+
     @Plugin.command('discover', group='sonos')
     def command_discover(self, event):
         self.bot.client.api.channels_typing(event.channel.id)
@@ -46,6 +55,10 @@ class SonosPlugin(Plugin):
 
     @Plugin.command('say', '<tts_msg:str...>')
     def command_say(self, event, tts_msg):
+        if len(tts_msg) > 100:
+            raise CommandError(':warning: Your speech is too powerful! Shorten it down a bit.')
+        if tts_msg.lower().startswith('alexa'):
+            raise CommandError(':rage: Stop trying to activate Alexa!')
         msg = event.msg.reply(':loudspeaker: Announcing...')
-        self.say(tts_msg)
-        msg.edit(':ok: Done announcing: `{}`!'.format(tts_msg))
+        self.say(tts_msg.encode('utf8'))
+        msg.edit(u':ok: Done announcing: `{}`'.format(tts_msg))
