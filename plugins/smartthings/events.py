@@ -57,8 +57,8 @@ class PresenceEmbed(EventEmbed):
 
 
 class MotionEmbed(EventEmbed):
-    attribute = 'presence'
-    emoji = ':iphone:'
+    attribute = 'motion'
+    emoji = ':eyes:'
     include = {
         'active'
     }

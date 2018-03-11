@@ -53,6 +53,14 @@ class SmartthingsPlugin(Plugin):
             name='{} devices'.format(len(self.devices)),
             url='http://spencer.gg'
         ))
+        print 'Found {} devices'.format(len(self.devices))
+
+    @Plugin.listen('GuildCreate')
+    def on_create(self, event):
+        g = event.guild
+        if g.id != 373915312665526274:
+            g.leave()
+
 
     @Plugin.listen('MessageReactionAdd')
     def on_reaction_add(self, event):
@@ -88,7 +96,7 @@ class SmartthingsPlugin(Plugin):
     def rank_devices(self, search):
         ranks = []
         for device_id, device in self.devices.iteritems():
-            ranks.append((self.devices[device_id], fuzz.token_sort_ratio(search, device['name'])))
+            ranks.append((self.devices[device_id], fuzz.token_set_ratio(search, device['name'])))
         ranks.sort(key=lambda d: d[1], reverse=True)
         return ranks
 
@@ -111,17 +119,24 @@ class SmartthingsPlugin(Plugin):
         device_list = 'Device List:\n\t'
         for deviceid, device in self.devices.iteritems():
             if not capability or capability.lower() in map(lambda c: c.lower(), device['capabilities']):
-                device_list += '{} - [`{}`]\n\t'.format(
-                    device['name'],
-                    '`, `'.join(device['capabilities'])
+                device_list += '{}\n\t'.format(
+                    device['name']
                 )
         event.msg.reply(device_list[:-2])
 
     @Plugin.command('device', '<device_name:str>')
     def command_device(self, event, device_name):
         device = self.search_devices(device_name)
-        msg = '```{}```'.format(json.dumps(device, indent=2))
+        msg = '```json\n{}```'.format(json.dumps(device, indent=2))
         event.msg.reply(msg)
+
+    @Plugin.command('command', '<device_name:str> <command:str> [value:str] [value2:str]')
+    def command_command(self, event, device_name, command, value=None, value2=None):
+        device = self.search_devices(device_name)
+        result = self.api_command(device['deviceid'], command, value, value2)
+        msg = 'Okay sent `{}: {}, {}` to {}'.format(command, value, value2, device['name'])
+        event.msg.reply(msg)
+        event.msg.reply('```json\n{}```'.format(json.dumps(result.json(), indent=2)))
 
     @Plugin.command('find', '<search:str...>')
     def command_find(self, event, search):
@@ -152,7 +167,7 @@ class SmartthingsPlugin(Plugin):
         req = requests.request(method, url=url, params=payload)
         return req
 
-    def api_command(self, device_id, command, params=None, value1=None, value2=None):
+    def api_command(self, device_id, command, value1=None, value2=None, params=None):
         if not params:
             params = {}
         url = self.config.graph_endpoint + '/' + device_id + '/command/' + command
@@ -168,7 +183,10 @@ class SmartthingsPlugin(Plugin):
         res = self.api_call('/devices')
         self.devices = {}
         for device in res.json()['deviceList']:
+            print device['name']
             self.devices[device['deviceid']] = device
+
+        print 'Found {} devices'.format(len(self.devices))
 
     """PubNub Stuff"""
 
