@@ -52,6 +52,7 @@ class SonosPlugin(Plugin):
         return flask.Response(status=404)
 
     def say(self, msg_id, msg):
+	raise CommandError('fuck off')
         msg_id = str(msg_id)
         res = self.polly.synthesize_speech(
             OutputFormat='mp3',
@@ -72,6 +73,7 @@ class SonosPlugin(Plugin):
     @Plugin.listen('MessageCreate')
     def on_messagecreate(self, event):
         msg = event.message
+	return
         if 61189081970774016 in msg.mentions:
             announcement = msg.channel.send_message(':loudspeaker: :house: Letting Spencer know that he was mentioned.')
             self.say(msg.id, u'Mentioned on Discord: {}'.format(msg.with_proper_mentions).replace('#0001', ''))

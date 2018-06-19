@@ -12,6 +12,11 @@ class DoormanPlugin(Plugin):
     def load(self, ctx):
         super(DoormanPlugin, self).load(ctx)
 
+    @Plugin.listen('GuildCreate')
+    def on_GuildCreate(self, event):
+        if event.guild.id != 373915312665526274:
+            event.guild.leave()
+
     @Plugin.listen('GuildMemberAdd')
     def on_GuildMemberAdd(self, event):
         user = event.member.user

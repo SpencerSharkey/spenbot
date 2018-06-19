@@ -40,6 +40,7 @@ class SmartthingsPlugin(Plugin):
         self.devices = {}
         self.switch_messages = {}
         self.switch_messages_id = {}
+        self.locked = False
 
     def load(self, ctx):
         self.load_devices()
@@ -55,13 +56,6 @@ class SmartthingsPlugin(Plugin):
         ))
         print 'Found {} devices'.format(len(self.devices))
 
-    @Plugin.listen('GuildCreate')
-    def on_create(self, event):
-        g = event.guild
-        if g.id != 373915312665526274:
-            g.leave()
-
-
     @Plugin.listen('MessageReactionAdd')
     def on_reaction_add(self, event):
         if self.reaction_hook(event):
@@ -71,8 +65,20 @@ class SmartthingsPlugin(Plugin):
     def on_reaction_remove(self, event):
         self.reaction_hook(event)
 
+    @Plugin.command('imacuck')
+    def command_imacuck(self, event):
+        if event.author.id not in [61189081970774016, 80351110224678912]:
+            return
+
+        self.locked = not self.locked
+        event.msg.reply('ye aight, we {} now'.format(
+            'locked' if self.locked else 'unlocked'
+        ))
+
     def reaction_hook(self, event):
         if event.user_id == self.state.me.id:
+            return
+        if self.locked:
             return
         msg_id = event.message_id
         if msg_id in self.switch_messages_id:
